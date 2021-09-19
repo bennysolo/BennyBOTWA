@@ -17,7 +17,7 @@ const getPP = async (jid) => {
 
 const msga = (message) => {
                 if (message.length >= 10){
-                    return `${message.substr(0, 10)}`
+                    return `${message.slice(0, 10)}`
                 }else{
                     return `${message}`
                 }
@@ -25,7 +25,7 @@ const msga = (message) => {
 
 /**DATABASE*/
 var presen = false
-var pren = 'recording'
+var pren = 'composing'
 var namabot = 'BennyBOT'
 
 module.exports = benny = async(benny, ben) => {
@@ -52,6 +52,7 @@ body = (type === 'conversation' && ben.message.conversation.startsWith(prefix)) 
 let command = body.slice(1).trim().split(/ +/).shift().toLowerCase()
 		const args = body.trim().split(/ +/).slice(1)
 		const isCmd = body.startsWith(prefix)
+		const isOwner = ownerNumber.includes(sender)
 		const arg = body.slice(command.length+2)
 		
 		 const reply = async(teks) => {
@@ -89,6 +90,9 @@ let command = body.slice(1).trim().split(/ +/).shift().toLowerCase()
 		case 'help':
 				let poy = 1
 	menunye = `*Hai kak ${pushname} ${decodeURI('%F0%9F%91%8B')}*\n*Nama aku adalah*\n*${namabot}*\n*Source: https://github.com/bennysolo/BennyBOTWA*\n*Aku terdapat beberapa fitur yang sangat berguna*\n*Dibawah ini:*
+*${poy++}.* ${prefix}presence on
+*${poy++}.* ${prefix}presence off
+*${poy++}.* ${prefix}setrecording
 *${poy++}.* ${prefix}owner
 *${poy++}.* ${prefix}sc
 *${poy++}.* ${prefix}artinama
@@ -119,6 +123,18 @@ break
 	let nama = await fetchJson(`https://cililitan.herokuapp.com/api/artinama?nama=${encodeURIComponent(arg)}`)
 	reply(nama.result)
 break
+case 'presence':
+if (!isOwner) return reply(mess.only.owner)
+	if (arg === 'on') {
+		presen = true
+		reply('*Presence telah aktif!*')
+	} else if (arg === 'off') {
+		presen = false
+		reply('*Presence telah naktif!*')
+	} else {
+		reply('Pilih on atau off!')
+	}
+break
 case 'owner':
 const vcard = 'BEGIN:VCARD\n'
             + `VERSION:3.0\n`
@@ -128,8 +144,12 @@ const vcard = 'BEGIN:VCARD\n'
             + `END:VCARD`
 			anub = await benny.sendMessage(from, {displayName: `Owner ${namabot}`, vcard: vcard}, contact, {quoted: ben})
 			benny.sendMessage(from, 'Itu nomor ownerku', text, {quoted: anub})
+			break
+			if (!isOwner) return reply(mess.only.owner)
+			case 'setrecording':
+			pren = 'recording'
+reply('*Presence telah diubah menjadi recording!*')
 				}
-				
 	}catch (e) {
 	console.log(String(e))
 		}
